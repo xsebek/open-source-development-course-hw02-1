@@ -15,6 +15,9 @@ print(a)
 Operations:
 - Addition with a scalar `a+1`
 - Vector addition: `a + b`
+- Vector reverse `reversed(a)`
+- Vector length `a.length()` (if you want dimension, use `len(a)`)
+- ...many more!
 
 ## Installation
 
