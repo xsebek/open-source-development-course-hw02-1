@@ -54,6 +54,7 @@ class Vector:
             return Vector([self.d[i] + other[i] for i in range(len(self))])
 
     def __sub__(self, other):
+        """Subtract vectors of same size. """
         if len(other) != len(self):
             raise ValueError('Vectors must have same length for subtraction!')
         self.d = [x - y for (x,y) in zip(self.d, other.d)]
