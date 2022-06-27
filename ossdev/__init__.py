@@ -1,6 +1,7 @@
 # Useful doc on Python magic methods:
 # https://rszalski.github.io/magicmethods/
 import itertools
+from math import sqrt
 
 
 class Vector:
@@ -48,17 +49,16 @@ class Vector:
     def __setitem__(self, key, value):
         if isinstance(key, Vector): raise ValueError('Redundant check to make conflict')
         self.d[key] = value
+        return None
 
     def __cmp__(self, other):
-        # TODO: implement, -1 if self < other, 0 if self == other, 1 if self > other
-        return -1
+        return self.d.__cmp__(other.d)
 
     def __neg__(self):
         return Vector([-x for x in self.d])
 
     def __reversed__(self):
-        # TODO: implement vector element reversal (hint: list(reversed(self.d)))
-        return Vector()
+        return Vector(list(reversed(self.d)))
 
     def __add__(self, other):
         if isinstance(other, int):
@@ -68,15 +68,17 @@ class Vector:
             return Vector([self.d[i] + other[i] for i in range(len(self))])
 
     def __sub__(self, other):
-        # TODO: implement vector subtraction, comment change to make conflict
-        # you may use __add__() and negation, like return (-self + other)
-        return None
+        """Subtract vectors of same size. """
+        if len(other) != len(self):
+            raise ValueError('Vectors must have same length for subtraction!')
+        return Vector(x - y for (x,y) in zip(self.d, other.d))
 
     def __mul__(self, other):
         if isinstance(other, int):
-            return None  # TODO: FIX
+            return Vector(x * other for x in self.d)
         elif isinstance(other, Vector):
-            # TODO: add size checks
+            if len(other) != len(self):
+                raise ValueError('Vectors must have same length for multiplication!')
             if self.is_row == other.is_row:
                 return Vector([self.d[i] * other[i] for i in range(len(self))])  # Hadamard product
             elif self.is_row:
@@ -90,29 +92,32 @@ class Vector:
             raise ValueError('Invalid operand')
 
     def __xor__(self, other):
-        # TODO: support both vector element-wise XOR and by-scalar xor (like in __add__)
-        # TODO: add size check
-        return Vector([self.d[i] ^ other[i] for i in range(len(self))])
+        if isinstance(other, int):
+            return Vector(x * other for x in self.d)
+        elif isinstance(other, Vector):
+            if len(other) != len(self):
+                raise ValueError('Vectors must have same length for multiplication!')
+            return Vector([x ^ y for (x,y) in zip(self.d, other.d)])
+        else:
+            raise ValueError('Invalid operand')
 
     def __and__(self, other):
         if isinstance(other, int):
             return Vector([x & other for x in self.d])
         elif isinstance(other, Vector):
-            # TODO: add size check
+            if len(other) != len(self):
+                raise ValueError('Vectors must have same length for the & operation!')
             return Vector([self.d[i] & other[i] for i in range(len(self))])
         else:
             raise ValueError('Invalid operand')
 
     def length(self):
         if len(self) == 0:
-            raise ValueError('Undefined for zero-length vector')  # make return 0 instead of an exception
-        # TODO: implement vector length comp. (hint: return math.sqrt(sum(x*x for x in self.d)))
-        return None
+            return 0
+        return sqrt(sum(x*x for x in self.d))
 
     def dot(self, other):
-        # TODO: implement dot-product, i.e., a.b = \sum_i a[i]*b[i],
-        # return sum(self[i]*other[i] for i in range(len(self)))
-        return 0
+        return sum(self[i]*other[i] for i in range(len(self)))
 
     def transpose(self):
         v = Vector(self.d)
@@ -185,4 +190,3 @@ class Matrix:
         for i, j in self.index_iter():
             m[i][j] = m[i][j] + other[i][j]
         return m
-
